@@ -25,5 +25,5 @@
 --- 
 
 ## Как выглядит результат работы скрипта:
+<img src="https://github.com/carrollstreet/Email-Finder/raw/main/img.png" width="500" height="400" />
 
-![](https://github.com/carrollstreet/Email-Finder/blob/main/img.png)
