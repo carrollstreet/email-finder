@@ -24,4 +24,6 @@
 
 --- 
 
-Как выглядит результат работы скрипта:
+## Как выглядит результат работы скрипта:
+
+![mailstretcher](https://github.com/carrollstreet/Email-Finder/blob/main/img.png?raw=true)
