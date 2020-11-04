@@ -24,7 +24,7 @@ def gitapimails():
                 if tlg_soup.find('div', class_="tgme_page_title") == None:
                     print("Can't find such user in Telegram")
                 else:
-                    print('Telegram user url:', tlg.url.lower())
+                    print('telegram_url:', tlg.url.lower())
             else:
                 print('Telegram nick must contain more than 4 symbols')
         except:
@@ -41,6 +41,7 @@ def gitapimails():
                     gitmail[mail] = name
             except:
                 pass
+        
         print()
         if len(gitmail) > 0:
             print('Emails from github public API:')
@@ -48,6 +49,17 @@ def gitapimails():
                 print('{} - {}'.format(i, k))
         else:
             print('There are no emails in github pubplic API for this profile')
+            
+        #hireable status
+        url_hr = 'https://api.github.com/users/' + nick 
+        r_hr = requests.get(url_hr)
+        try:
+            if r_hr.json()['hireable'] == True:
+                print('Status:  Hireable on GitHub Jobs')
+            else:
+                print('Status: NOT Hireable on GitHub Jobs')
+        except:
+            print("Can't receive hireable status")
         
         #поиск ящиков в коммитах
         print()
@@ -106,4 +118,3 @@ def retry():
     return gitapimails(), retry()
 
 retry()
-
