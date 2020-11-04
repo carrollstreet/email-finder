@@ -26,7 +26,7 @@ def gitapimails():
                 tlg_soup = BeautifulSoup(tlg.text, 'lxml')
                 try:
                     owner.append(tlg_soup.find('div',class_='tgme_page_title').text)
-                except:
+                except AttributeError:
                     pass
                 if tlg_soup.find('div', class_="tgme_page_title") == None:
                     print("Can't find such user in Telegram")
@@ -50,7 +50,7 @@ def gitapimails():
                     mail = req.json()[i]['payload']['commits'][j]['author']['email'].lower().strip()
                     name = req.json()[i]['payload']['commits'][j]['author']['name'].lower().strip()
                     gitmail[mail] = name
-            except:
+            except KeyError:
                 pass
         
         print()
@@ -92,12 +92,12 @@ def gitapimails():
                     rep_comm = requests.get(repolink_master[z])
                     soup = BeautifulSoup(rep_comm.text, 'lxml')
                     if (nick.lower() == soup.find('a', class_="commit-author user-mention").text.lower()) or (name == soup.find('span', class_="commit-author user-mention").text) or (name == soup.find('a', class_="commit-author user-mention").text):
-                        string = soup.find('ol', class_="commit-group Box Box--condensed").find('a').get('href')
+                        string = soup.find('a', class_='link-gray-dark text-bold js-navigation-open').get('href')
                         commit = re.findall('/commit/[\w]+', string)[0]
                         commit_url.append(str(repolink[z]) + commit + '.patch')
                     else:
                         continue
-                except:
+                except AttributeError:
                     pass
                 
             def worker(url):   
@@ -123,7 +123,7 @@ def gitapimails():
             else:
                 print("Can't find any emails in repositories")
         except:
-            pass
+            print("An error has occurred on this step")
         
         if len(errors) > 0:
             print("Can't extrat emails from these commits, you can check it:")
@@ -134,7 +134,7 @@ def gitapimails():
             print('-', end='')
         print()
     except:
-        pass
+        print('Something broken')
     print()
 
 def retry():
