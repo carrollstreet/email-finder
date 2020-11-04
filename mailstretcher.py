@@ -123,7 +123,7 @@ def gitapimails():
             else:
                 print("Can't find any emails in repositories")
         except:
-            print("Can't find any emails in repositories")
+            pass
         
         if len(errors) > 0:
             print("Can't extrat emails from these commits, you can check it:")
