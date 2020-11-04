@@ -26,7 +26,7 @@ def gitapimails():
                 tlg_soup = BeautifulSoup(tlg.text, 'lxml')
                 try:
                     owner.append(tlg_soup.find('div',class_='tgme_page_title').text)
-                except AttributeError:
+                except:
                     pass
                 if tlg_soup.find('div', class_="tgme_page_title") == None:
                     print("Can't find such user in Telegram")
@@ -50,7 +50,7 @@ def gitapimails():
                     mail = req.json()[i]['payload']['commits'][j]['author']['email'].lower().strip()
                     name = req.json()[i]['payload']['commits'][j]['author']['name'].lower().strip()
                     gitmail[mail] = name
-            except KeyError:
+            except:
                 pass
         
         print()
@@ -60,18 +60,7 @@ def gitapimails():
                 print('{} - {}'.format(i, k))
         else:
             print('There are no emails in github pubplic API for this profile')
-            
-        #hireable status
-        #url_hr = 'https://api.github.com/users/' + nick 
-        #r_hr = requests.get(url_hr)
-        #try:
-        #    if r_hr.json()['hireable'] == True:
-        #        print('Status:  Hireable on GitHub Jobs')
-        #    else:
-        #        print('Status: NOT Hireable on GitHub Jobs')
-        #except:
-        #    print("Can't receive hireable status")
-        
+             
         #поиск ящиков в коммитах
         print()
         print('Looking for emails in repositories, wait please')
@@ -97,7 +86,7 @@ def gitapimails():
                         commit_url.append(str(repolink[z]) + commit + '.patch')
                     else:
                         continue
-                except AttributeError:
+                except:
                     pass
                 
             def worker(url):   
@@ -134,7 +123,7 @@ def gitapimails():
             print('-', end='')
         print()
     except:
-        print('Something broken')
+        pass
     print()
 
 def retry():
