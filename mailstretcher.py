@@ -5,6 +5,8 @@ import requests
 import re
 from bs4 import BeautifulSoup
 import time
+import threading
+
 def gitapimails():
     errors = []
     commit_url = []
@@ -89,7 +91,7 @@ def gitapimails():
                 try:
                     rep_comm = requests.get(repolink_master[z])
                     soup = BeautifulSoup(rep_comm.text, 'lxml')
-                    if (nick.lower() == soup.find('a', class_="commit-author tooltipped tooltipped-s user-mention").text.lower()) or (name == soup.find('span', class_="commit-author user-mention").text):
+                    if (nick.lower() == soup.find('a', class_="commit-author user-mention").text.lower()) or (name == soup.find('span', class_="commit-author user-mention").text) or (name == soup.find('a', class_="commit-author user-mention").text):
                         string = soup.find('ol', class_="commit-group Box Box--condensed").find('a').get('href')
                         commit = re.findall('/commit/[\w]+', string)[0]
                         commit_url.append(str(repolink[z]) + commit + '.patch')
@@ -97,14 +99,23 @@ def gitapimails():
                         continue
                 except:
                     pass
-            
-            for i in commit_url:
+                
+            def worker(url):   
+                req_com = requests.get(url)
                 try:
-                    req_com = requests.get(i)
                     mails = re.findall('From: ([\w <@.-]+)', req_com.text)[0].replace('<', '- ')
                     mail_list.append(mails.lower().strip())
                 except:
                     errors.append(i)
+              
+            if len(commit_url) < 5:
+                for i in commit_url:
+                    worker(i)
+            else:
+                for i in commit_url:
+                    t = threading.Thread(target=worker, args=(i,))
+                    t.start()
+                time.sleep(2)
                     
             if len(mail_list) > 0:
                 print('Emails from commit.patch:')
@@ -125,6 +136,7 @@ def gitapimails():
     except:
         pass
     print()
+
 def retry():
     return gitapimails(), retry()
 
