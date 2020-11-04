@@ -10,6 +10,7 @@ def gitapimails():
     commit_url = []
     mail_list = []
     repolink = []
+    owner= []
     gitmail = {}
     try:
         #ввод ника
@@ -21,10 +22,18 @@ def gitapimails():
             if len(nick) > 4:
                 tlg = requests.get('https://telegram.me/' + nick)
                 tlg_soup = BeautifulSoup(tlg.text, 'lxml')
+                try:
+                    owner.append(tlg_soup.find('div',class_='tgme_page_title').text)
+                except:
+                    pass
                 if tlg_soup.find('div', class_="tgme_page_title") == None:
                     print("Can't find such user in Telegram")
                 else:
-                    print('telegram_url:', tlg.url.lower())
+                    if len(owner) > 0:
+                        print('Using nickname to find telegram account:')
+                        print(f'{owner[0]} - {tlg.url.lower()}')
+                    else:
+                        print(f'Using nickname to find telegram account: {tlg.url.lower()}')
             else:
                 print('Telegram nick must contain more than 4 symbols')
         except:
@@ -51,15 +60,15 @@ def gitapimails():
             print('There are no emails in github pubplic API for this profile')
             
         #hireable status
-        url_hr = 'https://api.github.com/users/' + nick 
-        r_hr = requests.get(url_hr)
-        try:
-            if r_hr.json()['hireable'] == True:
-                print('Status:  Hireable on GitHub Jobs')
-            else:
-                print('Status: NOT Hireable on GitHub Jobs')
-        except:
-            print("Can't receive hireable status")
+        #url_hr = 'https://api.github.com/users/' + nick 
+        #r_hr = requests.get(url_hr)
+        #try:
+        #    if r_hr.json()['hireable'] == True:
+        #        print('Status:  Hireable on GitHub Jobs')
+        #    else:
+        #        print('Status: NOT Hireable on GitHub Jobs')
+        #except:
+        #    print("Can't receive hireable status")
         
         #поиск ящиков в коммитах
         print()
@@ -108,12 +117,14 @@ def gitapimails():
         if len(errors) > 0:
             print("Can't extrat emails from these commits, you can check it:")
             print('\n'.join(errors))
-       
-        print('Emails search took {:.2f} seconds'.format(time.time()-start))
+        timing = 'Emails search took {:.2f} seconds'.format(time.time()-start)
+        print(timing)
+        for i in range(len(timing)):
+            print('-', end='')
         print()
     except:
         pass
-        print()
+    print()
 def retry():
     return gitapimails(), retry()
 
