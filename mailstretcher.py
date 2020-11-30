@@ -19,6 +19,7 @@ def gitapimails():
         nick = input('Enter GitHub User Nickname: ').strip()
         #старт отсчета времени
         start = time.time()
+        
         #поиск по нику в Telegram
         try:
             if len(nick) > 4:
@@ -43,7 +44,8 @@ def gitapimails():
 
         #поиск по github api
         url = 'https://api.github.com/users/' + nick + '/events/public'
-        req = requests.get(url)
+        s = requests.Session()
+        req = s.get(url)
         for i in range(len(req.json())):
             try:
                 for j in range(len(req.json())):
@@ -67,7 +69,7 @@ def gitapimails():
         print()
         try:
             start_url = 'https://github.com/' + nick + '?tab=repositories'
-            r = requests.get(start_url)
+            r = s.get(start_url)
             soup = BeautifulSoup(r.text, 'lxml')
             name = soup.find('span', class_="p-name vcard-fullname d-block overflow-hidden").text
             
@@ -78,7 +80,7 @@ def gitapimails():
             
             for z in range(len(repolink_master)):
                 try:
-                    rep_comm = requests.get(repolink_master[z])
+                    rep_comm = s.get(repolink_master[z])
                     soup = BeautifulSoup(rep_comm.text, 'lxml')
                     if (nick.lower() == soup.find('a', class_="commit-author user-mention").text.lower()) or (name == soup.find('span', class_="commit-author user-mention").text) or (name == soup.find('a', class_="commit-author user-mention").text):
                         string = soup.find('a', class_='link-gray-dark text-bold js-navigation-open').get('href')
@@ -90,7 +92,7 @@ def gitapimails():
                     pass
                 
             def worker(url):   
-                req_com = requests.get(url)
+                req_com = s.get(url)
                 try:
                     mails = re.findall('From: ([\w <@.-]+)', req_com.text)[0].replace('<', '- ')
                     mail_list.append(mails.lower().strip())
