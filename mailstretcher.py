@@ -106,7 +106,7 @@ def gitapimails():
                 for i in commit_url:
                     t = threading.Thread(target=worker, args=(i,))
                     t.start()
-                time.sleep(2)
+                    t.join()
                     
             if len(mail_list) > 0:
                 print('Emails from commit.patch:')
