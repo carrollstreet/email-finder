@@ -6,6 +6,7 @@ import re
 from bs4 import BeautifulSoup
 import time
 import threading
+import sys
 
 def gitapimails():
     errors = []
@@ -15,12 +16,11 @@ def gitapimails():
     owner= []
     gitmail = {}
     try:
-        #ввод ника
         nick = input('Enter GitHub User Nickname: ').strip()
-        #старт отсчета времени
+        #timing
         start = time.time()
         
-        #поиск по нику в Telegram
+        #Searching by nickname in Tg
         try:
             if len(nick) > 4:
                 tlg = requests.get('https://telegram.me/' + nick)
@@ -42,7 +42,7 @@ def gitapimails():
         except:
             print('Wrong nickname for Telegram user')
 
-        #поиск по github api
+        #searching by github api
         url = 'https://api.github.com/users/' + nick + '/events/public'
         s = requests.Session()
         req = s.get(url)
@@ -63,7 +63,7 @@ def gitapimails():
         else:
             print('There are no emails in github pubplic API for this profile')
              
-        #поиск ящиков в коммитах
+        #commits search
         print()
         print('Looking for emails in repositories, wait please')
         print()
@@ -71,25 +71,31 @@ def gitapimails():
             start_url = 'https://github.com/' + nick + '?tab=repositories'
             r = s.get(start_url)
             soup = BeautifulSoup(r.text, 'lxml')
-            name = soup.find('span', class_="p-name vcard-fullname d-block overflow-hidden").text
+            name = soup.find('span', class_="p-name vcard-fullname d-block overflow-hidden").text.strip()
             
             for i in soup.find_all('div', class_="d-inline-block mb-1"):
-                if 'Forked' not in str(i.find('span')) and 'Archived' not in str(i.find('span', class_="Label Label--outline v-align-middle ml-1 mb-1")):
+                if 'forked' not in str(i).lower():
                     repolink.append('https://github.com' + i.find('a').get('href'))
-            repolink_master = [str(i) + '/commits/master' for i in repolink]
+            repolink_master = [str(i) + '/commits' for i in repolink]
             
             for z in range(len(repolink_master)):
                 try:
                     rep_comm = s.get(repolink_master[z])
                     soup = BeautifulSoup(rep_comm.text, 'lxml')
-                    if (nick.lower() == soup.find('a', class_="commit-author user-mention").text.lower()) or (name == soup.find('span', class_="commit-author user-mention").text) or (name == soup.find('a', class_="commit-author user-mention").text):
-                        string = soup.find('a', class_='link-gray-dark text-bold js-navigation-open').get('href')
+                    try:
+                        author = soup.find('a', class_="commit-author user-mention").text
+                    except:
+                        author = soup.find('span', class_="commit-author user-mention").text
+    
+                    if (nick.lower() == author.lower()) or (name == author):
+                        string = soup.find('a', class_='Link--primary text-bold js-navigation-open markdown-title').get('href')
                         commit = re.findall('/commit/[\w]+', string)[0]
                         commit_url.append(str(repolink[z]) + commit + '.patch')
                     else:
                         continue
-                except:
-                    pass
+    
+                except Exception as err:
+                    print(err)
                 
             def worker(url):   
                 req_com = s.get(url)
@@ -113,8 +119,8 @@ def gitapimails():
                 print('\n'.join(set(mail_list)))
             else:
                 print("Can't find any emails in repositories")
-        except:
-            print("An error has occurred on this step")
+        except Exception as err:
+            print(err)
         
         if len(errors) > 0:
             print("Can't extrat emails from these commits, you can check it:")
@@ -124,9 +130,12 @@ def gitapimails():
         for i in range(len(timing)):
             print('-', end='')
         print()
-    except:
-        pass
+    except KeyboardInterrupt:
+        sys.exit()
+    except Exception as err:
+        print(err)
     print()
+
 
 def retry():
     return gitapimails(), retry()
