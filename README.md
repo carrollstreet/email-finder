@@ -9,5 +9,4 @@ You have to enter the username of the GitHub user and the script will try to fin
 --- 
 
 ## How it looks like:
-<img src="https://github.com/carrollstreet/Email-Finder/raw/main/img.png" width="500" height="400" />
-
+<img width="409" alt="Снимок экрана 2021-10-02 в 15 08 45" src="https://user-images.githubusercontent.com/7578492/135715471-393abab9-9f82-41a8-831a-868de377120e.png">
