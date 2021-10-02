@@ -27,9 +27,7 @@ def gitapimails():
                 tlg_soup = BeautifulSoup(tlg.text, 'lxml')
                 try:
                     owner.append(tlg_soup.find('div',class_='tgme_page_title').text)
-                except:
-                    pass
-                if tlg_soup.find('div', class_="tgme_page_title") == None:
+                except AttributeError:
                     print("Can't find such user in Telegram")
                 else:
                     if len(owner) > 0:
@@ -42,7 +40,7 @@ def gitapimails():
         except:
             print('Wrong nickname for Telegram user')
 
-        #searching by github api
+        #searching in github api
         url = 'https://api.github.com/users/' + nick + '/events/public'
         s = requests.Session()
         req = s.get(url)
@@ -63,7 +61,7 @@ def gitapimails():
         else:
             print('There are no emails in github pubplic API for this profile')
              
-        #commits search
+        #searching in commits
         print()
         print('Looking for emails in repositories, wait please')
         print()
@@ -71,13 +69,18 @@ def gitapimails():
             start_url = 'https://github.com/' + nick + '?tab=repositories'
             r = s.get(start_url)
             soup = BeautifulSoup(r.text, 'lxml')
-            name = soup.find('span', class_="p-name vcard-fullname d-block overflow-hidden").text.strip()
             
+            #extract name from the main page
+            name = soup.find('span', class_="p-name vcard-fullname d-block overflow-hidden").text.strip()
+
+            #check all repos on the first page if it forked all archived and collect if not
             for i in soup.find_all('div', class_="d-inline-block mb-1"):
                 if 'forked' not in str(i).lower():
-                    repolink.append('https://github.com' + i.find('a').get('href'))
+                    if 'archive' not in str(i).lower():
+                        repolink.append('https://github.com' + i.find('a').get('href'))
             repolink_master = [str(i) + '/commits' for i in repolink]
-            
+
+            #extract all first commits from collected repos if it belong to the repository author
             for z in range(len(repolink_master)):
                 try:
                     rep_comm = s.get(repolink_master[z])
@@ -96,7 +99,8 @@ def gitapimails():
     
                 except Exception as err:
                     print(err)
-                
+
+            #extract emails from commits    
             def worker(url):   
                 req_com = s.get(url)
                 try:
