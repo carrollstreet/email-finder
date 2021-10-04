@@ -8,7 +8,7 @@ import time
 import threading
 import sys
 
-def gitapimails():
+def extract_email():
     errors = []
     commit_url = []
     mail_list = []
@@ -37,8 +37,8 @@ def gitapimails():
                         print(f'Using nickname to find telegram account: {tlg.url.lower()}')
             else:
                 print('Telegram nick must contain more than 4 symbols')
-        except:
-            print('Wrong nickname for Telegram user')
+        except Exception as err:
+            print(f'Something went wrong: {err}')
 
         #searching in github api
         url = 'https://api.github.com/users/' + nick + '/events/public'
@@ -134,14 +134,11 @@ def gitapimails():
         for i in range(len(timing)):
             print('-', end='')
         print()
-    except KeyboardInterrupt:
-        sys.exit()
     except Exception as err:
         print(err)
     print()
 
 
-def retry():
-    return gitapimails(), retry()
-
-retry()
+if __name__ == "__main__":
+    while True:
+      extract_email()
