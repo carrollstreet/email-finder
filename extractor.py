@@ -121,14 +121,14 @@ def extract_email():
             if len(mail_list) > 0:
                 print('Emails from commit.patch:')
                 print('\n'.join(set(mail_list)))
-            else:
+            if len(errors) > 0:
+                print("Can't extrat emails from these commits, you can check it:")
+                print('\n'.join(errors))
+            if len(errors) == 0 and len(mail_list) == 0:
                 print("Can't find any emails in repositories")
         except Exception as err:
             print(err)
         
-        if len(errors) > 0:
-            print("Can't extrat emails from these commits, you can check it:")
-            print('\n'.join(errors))
         timing = 'Emails search took {:.2f} seconds'.format(time.time()-start)
         print(timing)
         for i in range(len(timing)):
