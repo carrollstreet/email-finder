@@ -113,9 +113,12 @@ def extract_email():
                 for i in commit_url:
                     worker(i)
             else:
+                threads = []
                 for i in commit_url:
                     t = threading.Thread(target=worker, args=(i,))
                     t.start()
+                    threads.append(t)
+                for t in threads:
                     t.join()
                     
             if len(mail_list) > 0:
