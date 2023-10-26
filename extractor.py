@@ -7,6 +7,8 @@ from bs4 import BeautifulSoup
 import time
 import threading
 import sys
+import warnings
+warnings.filterwarnings("ignore")
 
 def extract_email():
     errors = []
